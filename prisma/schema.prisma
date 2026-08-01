@@ -1,0 +1,161 @@
+// Portal Escolar Inteligente - schema de demonstração
+// MVP: Aluno, Professor, Coordenação + IA + XP + Badges + Bug Bounty + Inscrições Dev
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String   @id @default(cuid())
+  email         String   @unique
+  name          String
+  role          String   @default("ALUNO") // ALUNO | PROFESSOR | COORDENACAO | ADMIN
+  turno         String?  // MANHA | TARDE (somente ALUNO)
+  turmaId       String?
+  turma         Turma?   @relation(fields: [turmaId], references: [id])
+  avatarUrl     String?
+  xp            Int      @default(0) // XP da temporada atual
+  xpTotal       Int      @default(0) // XP histórico (nunca reseta)
+  iaUsadasHoje  Int      @default(0)
+  iaDataUltima  String?  // data ISO yyyy-mm-dd do último uso
+  iaLimiteDiario Int     @default(15)
+  sequenciaDias Int      @default(0)
+  ativo         Boolean  @default(true)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  avisosPublicados Aviso[]
+  tarefasCriadas   Tarefa[]
+  entregasFeitas   Entrega[]    @relation("EntregaAluno")
+  entregasCorrigidas Entrega[]  @relation("EntregaCorretor")
+  xpLogs           XPLog[]
+  bugsReportados   BugReport[]
+  inscricoesDev    InscricaoDev[]
+  userBadges       UserBadge[]
+  sessaoAtual      Sessao?
+}
+
+model Turma {
+  id        String @id @default(cuid())
+  nome      String @unique // "9A", "9B", "1EM-A", etc.
+  turno     String // MANHA | TARDE
+  ano       String // "9º Ano", "1º EM"
+  alunos    User[]
+  tarefas   Tarefa[]
+  createdAt DateTime @default(now())
+}
+
+model Aviso {
+  id        String @id @default(cuid())
+  titulo    String
+  conteudo  String
+  categoria String @default("GERAL") // GERAL | URGENTE | EVENTO | ACADEMICO
+  destaque  Boolean @default(false)
+  autorId   String
+  autor     User   @relation(fields: [autorId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Tarefa {
+  id           String @id @default(cuid())
+  titulo       String
+  descricao    String
+  turmaId      String
+  turma        Turma  @relation(fields: [turmaId], references: [id])
+  professorId  String
+  professor    User   @relation(fields: [professorId], references: [id])
+  xpRecompensa Int    @default(50)
+  prazo        DateTime?
+  createdAt    DateTime @default(now())
+  entregas     Entrega[]
+}
+
+model Entrega {
+  id           String @id @default(cuid())
+  tarefaId     String
+  tarefa       Tarefa @relation(fields: [tarefaId], references: [id])
+  alunoId      String
+  aluno        User   @relation("EntregaAluno", fields: [alunoId], references: [id])
+  conteudo     String
+  status       String @default("PENDENTE") // PENDENTE | CORRIGIDA | RECUSADA
+  xpConcedido  Int?
+  corretorId   String?
+  corretor     User?  @relation("EntregaCorretor", fields: [corretorId], references: [id])
+  feedback     String?
+  createdAt    DateTime @default(now())
+  corrigidoEm  DateTime?
+}
+
+model XPLog {
+  id         String @id @default(cuid())
+  userId     String
+  user       User   @relation(fields: [userId], references: [id])
+  quantidade Int
+  motivo     String
+  origem     String // TAREFA | BUG | MANUAL | BIBLIOTECA
+  createdAt  DateTime @default(now())
+}
+
+model BugReport {
+  id           String @id @default(cuid())
+  userId       String
+  user         User   @relation(fields: [userId], references: [id])
+  local        String
+  acao         String
+  ocorreu      String
+  esperado     String
+  categoria    String @default("SUGESTAO") // CRITICO | NORMAL | SUGESTAO | INVALIDO
+  status       String @default("ABERTO") // ABERTO | EM_ANALISE | ACEITO | RECUSADO
+  recompensaXP Int?
+  createdAt    DateTime @default(now())
+  resolvidoEm  DateTime?
+}
+
+model Badge {
+  id        String @id @default(cuid())
+  nome      String @unique
+  descricao String
+  icone     String // emoji ou nome
+  raridade  String @default("COMUM") // COMUM | RARA | EPICA | LENDARIA | ESPECIAL
+  tipo      String @default("ACADEMICA") // ACADEMICA | CONTRIBUICAO | ESPECIAL
+  daXP      Boolean @default(false) // badges especiais não dão XP
+  userBadges UserBadge[]
+}
+
+model UserBadge {
+  id         String @id @default(cuid())
+  userId     String
+  user       User   @relation(fields: [userId], references: [id])
+  badgeId    String
+  badge      Badge  @relation(fields: [badgeId], references: [id])
+  concedidoEm DateTime @default(now())
+}
+
+model InscricaoDev {
+  id          String @id @default(cuid())
+  userId      String
+  user        User   @relation(fields: [userId], references: [id])
+  area        String // PROGRAMACAO | DESIGN | TESTES | IDEIAS | ORGANIZACAO
+  experiencia String?
+  motivo      String
+  analiseIA   String? // resumo gerado pela IA
+  scoreIA     Int?    // 0-100
+  status      String @default("PENDENTE") // PENDENTE | EM_ANALISE | ACEITO | RECUSADO | PERIODO_TESTE
+  createdAt   DateTime @default(now())
+  decididoEm  DateTime?
+}
+
+model Sessao {
+  id        String @id @default(cuid())
+  token     String @unique
+  userId    String @unique
+  user      User   @relation(fields: [userId], references: [id])
+  createdAt DateTime @default(now())
+  expiresAt DateTime
+}
