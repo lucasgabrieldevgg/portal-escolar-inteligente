@@ -1,9 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { db } from '@/lib/db'
+import { db, garantirBanco } from '@/lib/db'
 import { requireRole } from '@/lib/auth'
 
 // POST /api/bugs/[id]/avaliar -> coordenação avalia bug e concede XP
 export async function POST(req: NextRequest, ctx: { params: Promise<{ id: string }> }) {
+  await garantirBanco()
   const user = await requireRole(['COORDENACAO', 'ADMIN'])
   const { id } = await ctx.params
   const { categoria, status } = await req.json()

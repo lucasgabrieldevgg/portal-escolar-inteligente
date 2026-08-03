@@ -97,7 +97,7 @@ export function InscricaoDevView() {
             <li>Você se inscreve escolhendo uma área de interesse.</li>
             <li>A IA faz uma análise inicial: resume sua inscrição e dá um score.</li>
             <li>A coordenação revisa (a IA não decide sozinha).</li>
-            <li>Se aceito, você entra em período de teste e recebe a badge 💻 Fundador.</li>
+            <li>Se aceito, você entra em período de teste e recebe a badge 🔧 Colaborador Técnico.</li>
           </ol>
           <p className="mt-2 text-xs text-emerald-700">
             Importante: a badge de colaborador <strong>não dá XP nem entra no ranking</strong> — ela é reconhecimento de contribuição, não de desempenho acadêmico.

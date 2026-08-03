@@ -1,35 +1,40 @@
-// Portal Escolar Inteligente - schema de demonstração
-// MVP: Aluno, Professor, Coordenação + IA + XP + Badges + Bug Bounty + Inscrições Dev
+// Portal Escolar Inteligente - schema v0.6 (Postgres + Supabase)
+// Roles: ALUNO | PROFESSOR | BIBLIOTECARIO | COORDENACAO | ADMIN
 
 generator client {
   provider = "prisma-client-js"
 }
 
 datasource db {
-  provider = "sqlite"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
 model User {
   id            String   @id @default(cuid())
   email         String   @unique
+  senhaHash     String
   name          String
-  role          String   @default("ALUNO") // ALUNO | PROFESSOR | COORDENACAO | ADMIN
-  turno         String?  // MANHA | TARDE (somente ALUNO)
+  role          String   @default("ALUNO")
+  turno         String?
   turmaId       String?
   turma         Turma?   @relation(fields: [turmaId], references: [id])
-  avatarUrl     String?
-  xp            Int      @default(0) // XP da temporada atual
-  xpTotal       Int      @default(0) // XP histórico (nunca reseta)
+  materias      String?
+  avatarConfig  String?
+  xp            Int      @default(0)
+  xpTotal       Int      @default(0)
+  moedinhas     Int      @default(50)
   iaUsadasHoje  Int      @default(0)
-  iaDataUltima  String?  // data ISO yyyy-mm-dd do último uso
+  iaDataUltima  String?
   iaLimiteDiario Int     @default(15)
   sequenciaDias Int      @default(0)
   ativo         Boolean  @default(true)
+  criadoPorId   String?
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
 
   avisosPublicados Aviso[]
+  avisosTurmaPublicados AvisoTurma[]
   tarefasCriadas   Tarefa[]
   entregasFeitas   Entrega[]    @relation("EntregaAluno")
   entregasCorrigidas Entrega[]  @relation("EntregaCorretor")
@@ -37,16 +42,20 @@ model User {
   bugsReportados   BugReport[]
   inscricoesDev    InscricaoDev[]
   userBadges       UserBadge[]
+  userSkins        UserSkin[]
+  resumosBiblioteca ResumoBiblioteca[] @relation("ResumosAluno")
+  resumosValidados ResumoBiblioteca[]  @relation("ResumosValidador")
   sessaoAtual      Sessao?
 }
 
 model Turma {
   id        String @id @default(cuid())
-  nome      String @unique // "9A", "9B", "1EM-A", etc.
-  turno     String // MANHA | TARDE
-  ano       String // "9º Ano", "1º EM"
+  nome      String @unique
+  turno     String
+  ano       String
   alunos    User[]
   tarefas   Tarefa[]
+  avisosTurma AvisoTurma[]
   createdAt DateTime @default(now())
 }
 
@@ -54,12 +63,23 @@ model Aviso {
   id        String @id @default(cuid())
   titulo    String
   conteudo  String
-  categoria String @default("GERAL") // GERAL | URGENTE | EVENTO | ACADEMICO
+  categoria String @default("GERAL")
   destaque  Boolean @default(false)
   autorId   String
   autor     User   @relation(fields: [autorId], references: [id])
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+model AvisoTurma {
+  id        String @id @default(cuid())
+  titulo    String
+  conteudo  String
+  turmaId   String
+  turma     Turma  @relation(fields: [turmaId], references: [id])
+  professorId String
+  professor User   @relation(fields: [professorId], references: [id])
+  createdAt DateTime @default(now())
 }
 
 model Tarefa {
@@ -71,6 +91,7 @@ model Tarefa {
   professorId  String
   professor    User   @relation(fields: [professorId], references: [id])
   xpRecompensa Int    @default(50)
+  moedinhasRecompensa Int @default(10)
   prazo        DateTime?
   createdAt    DateTime @default(now())
   entregas     Entrega[]
@@ -83,8 +104,9 @@ model Entrega {
   alunoId      String
   aluno        User   @relation("EntregaAluno", fields: [alunoId], references: [id])
   conteudo     String
-  status       String @default("PENDENTE") // PENDENTE | CORRIGIDA | RECUSADA
+  status       String @default("PENDENTE")
   xpConcedido  Int?
+  moedinhasConcedidas Int?
   corretorId   String?
   corretor     User?  @relation("EntregaCorretor", fields: [corretorId], references: [id])
   feedback     String?
@@ -98,7 +120,8 @@ model XPLog {
   user       User   @relation(fields: [userId], references: [id])
   quantidade Int
   motivo     String
-  origem     String // TAREFA | BUG | MANUAL | BIBLIOTECA
+  origem     String
+  tipo       String @default("XP")
   createdAt  DateTime @default(now())
 }
 
@@ -110,22 +133,25 @@ model BugReport {
   acao         String
   ocorreu      String
   esperado     String
-  categoria    String @default("SUGESTAO") // CRITICO | NORMAL | SUGESTAO | INVALIDO
-  status       String @default("ABERTO") // ABERTO | EM_ANALISE | ACEITO | RECUSADO
+  categoria    String @default("SUGESTAO")
+  status       String @default("ABERTO")
   recompensaXP Int?
   createdAt    DateTime @default(now())
   resolvidoEm  DateTime?
 }
 
 model Badge {
-  id        String @id @default(cuid())
-  nome      String @unique
-  descricao String
-  icone     String // emoji ou nome
-  raridade  String @default("COMUM") // COMUM | RARA | EPICA | LENDARIA | ESPECIAL
-  tipo      String @default("ACADEMICA") // ACADEMICA | CONTRIBUICAO | ESPECIAL
-  daXP      Boolean @default(false) // badges especiais não dão XP
-  userBadges UserBadge[]
+  id           String @id @default(cuid())
+  nome         String @unique
+  descricao    String
+  icone        String
+  raridade     String @default("COMUM")
+  tipo         String @default("ACADEMICA")
+  daXP         Boolean @default(false)
+  xpRecompensa Int    @default(0)
+  apenasAdmin  Boolean @default(false)
+  automatica   Boolean @default(false)
+  userBadges   UserBadge[]
 }
 
 model UserBadge {
@@ -135,18 +161,45 @@ model UserBadge {
   badgeId    String
   badge      Badge  @relation(fields: [badgeId], references: [id])
   concedidoEm DateTime @default(now())
+  concedidoPor String?
+
+  @@unique([userId, badgeId])
+}
+
+model Skin {
+  id          String @id @default(cuid())
+  nome        String @unique
+  descricao   String
+  tipo        String
+  raridade    String @default("COMUM")
+  preco       Int    @default(10)
+  config      String
+  icone       String
+  ativa       Boolean @default(true)
+  userSkins   UserSkin[]
+}
+
+model UserSkin {
+  id        String @id @default(cuid())
+  userId    String
+  user      User   @relation(fields: [userId], references: [id])
+  skinId    String
+  skin      Skin   @relation(fields: [skinId], references: [id])
+  compradoEm DateTime @default(now())
+
+  @@unique([userId, skinId])
 }
 
 model InscricaoDev {
   id          String @id @default(cuid())
   userId      String
   user        User   @relation(fields: [userId], references: [id])
-  area        String // PROGRAMACAO | DESIGN | TESTES | IDEIAS | ORGANIZACAO
+  area        String
   experiencia String?
   motivo      String
-  analiseIA   String? // resumo gerado pela IA
-  scoreIA     Int?    // 0-100
-  status      String @default("PENDENTE") // PENDENTE | EM_ANALISE | ACEITO | RECUSADO | PERIODO_TESTE
+  analiseIA   String?
+  scoreIA     Int?
+  status      String @default("PENDENTE")
   createdAt   DateTime @default(now())
   decididoEm  DateTime?
 }
@@ -158,4 +211,28 @@ model Sessao {
   user      User   @relation(fields: [userId], references: [id])
   createdAt DateTime @default(now())
   expiresAt DateTime
+}
+
+model ResumoBiblioteca {
+  id          String @id @default(cuid())
+  alunoId     String
+  aluno       User   @relation("ResumosAluno", fields: [alunoId], references: [id])
+  livroTitulo String
+  livroAutor  String?
+  resumo      String
+  status      String @default("PENDENTE")
+  xpRecompensa Int   @default(30)
+  moedinhasRecompensa Int @default(15)
+  validadoPorId String?
+  validadoPor  User?  @relation("ResumosValidador", fields: [validadoPorId], references: [id])
+  feedback    String?
+  createdAt   DateTime @default(now())
+  validadoEm  DateTime?
+}
+
+model Setting {
+  id        String @id @default(cuid())
+  chave     String @unique
+  valor     String
+  updatedAt DateTime @updatedAt
 }

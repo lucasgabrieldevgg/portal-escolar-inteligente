@@ -14,6 +14,7 @@ import { Megaphone, Plus, Pin, Trash2, AlertTriangle } from 'lucide-react'
 import { formatDistanceToNow } from 'date-fns'
 import { ptBR } from 'date-fns/locale'
 import { toast } from 'sonner'
+import { ReformularTextArea } from '../ReformularTextArea'
 
 interface Aviso {
   id: string
@@ -106,9 +107,9 @@ export function CoordAvisos() {
             </div>
             <div>
               <Label className="text-xs">Conteúdo</Label>
-              <Textarea
+              <ReformularTextArea
                 value={form.conteudo}
-                onChange={(e) => setForm({ ...form, conteudo: e.target.value })}
+                onChange={(v) => setForm({ ...form, conteudo: v })}
                 rows={5}
               />
             </div>

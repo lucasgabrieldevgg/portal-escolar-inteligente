@@ -5,7 +5,9 @@ import { api } from '@/lib/store'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { Badge as BadgeUI } from '@/components/ui/badge'
 import { Progress } from '@/components/ui/progress'
-import { Award, Flame, Trophy, Calendar, Sparkles } from 'lucide-react'
+import { Avatar } from '../Avatar'
+import { AvatarEditor } from '../AvatarEditor'
+import { Award, Flame, Trophy, Calendar, Sparkles, Coins } from 'lucide-react'
 import { format } from 'date-fns'
 import { ptBR } from 'date-fns/locale'
 
@@ -15,8 +17,10 @@ interface Perfil {
   role: string
   turno: string | null
   turma: { nome: string; ano: string } | null
+  avatarConfig?: string | null
   xp: number
   xpTotal: number
+  moedinhas?: number
   sequenciaDias: number
   createdAt: string
   userBadges: { badge: Badge }[]
@@ -30,6 +34,9 @@ interface Badge {
   raridade: string
   tipo: string
   daXP: boolean
+  xpRecompensa?: number
+  apenasAdmin?: boolean
+  automatica?: boolean
 }
 
 const RARIDADE_STYLE: Record<string, string> = {
@@ -48,15 +55,22 @@ const RARIDADE_LABEL: Record<string, string> = {
   ESPECIAL: 'Especial',
 }
 
-export function PerfilView({ userId }: { userId: string }) {
+export function PerfilView({ userId, editAvatar }: { userId: string; editAvatar?: boolean }) {
   const [perfil, setPerfil] = useState<Perfil | null>(null)
   const [loading, setLoading] = useState(true)
+  const [editandoExtra, setEditandoExtra] = useState(false)
+  // modoEdicao é derivado: começa em edição se editAvatar=true, ou se o usuário clicou em "editar"
+  const modoEdicao = editAvatar || editandoExtra
 
-  useEffect(() => {
+  const reload = () => {
     api<{ user: Perfil }>(`/api/perfil/${userId}`).then((d) => {
       setPerfil(d.user)
       setLoading(false)
     })
+  }
+
+  useEffect(() => {
+    reload()
   }, [userId])
 
   if (loading || !perfil) {
@@ -73,9 +87,7 @@ export function PerfilView({ userId }: { userId: string }) {
       <Card className="overflow-hidden border-0 bg-gradient-to-br from-emerald-600 to-emerald-800 text-white">
         <CardContent className="p-6">
           <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
-            <div className="w-20 h-20 rounded-full bg-gradient-to-br from-amber-300 to-amber-500 flex items-center justify-center text-3xl font-bold shadow-lg">
-              {perfil.name.charAt(0)}
-            </div>
+            <Avatar config={perfil.avatarConfig} name={perfil.name} size="xl" className="ring-4 ring-white/30" />
             <div className="flex-1">
               <h2 className="text-2xl font-bold">{perfil.name}</h2>
               <p className="text-emerald-100 text-sm">
@@ -127,6 +139,26 @@ export function PerfilView({ userId }: { userId: string }) {
         </Card>
       </div>
 
+      {perfil.role === 'ALUNO' && (
+        <Card>
+          <CardContent className="p-3 flex items-center gap-3">
+            <Coins className="w-5 h-5 text-emerald-600" />
+            <div className="flex-1">
+              <p className="text-sm font-semibold">{perfil.moedinhas || 0} moedinhas</p>
+              <p className="text-xs text-muted-foreground">Use na loja para personalizar seu avatar.</p>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Editor de avatar (somente para o próprio usuário) */}
+      {modoEdicao && (
+        <AvatarEditor
+          avatarConfig={perfil.avatarConfig}
+          onSaved={reload}
+        />
+      )}
+
       {/* Conquistas */}
       <Card>
         <CardHeader>
@@ -153,6 +185,12 @@ export function PerfilView({ userId }: { userId: string }) {
                     <span className="text-3xl mb-1">{b.icone}</span>
                     <p className="font-semibold text-xs">{b.nome}</p>
                     <p className="text-[10px] opacity-80 mt-0.5">{RARIDADE_LABEL[b.raridade]}</p>
+                    {b.apenasAdmin && (
+                      <span className="text-[9px] mt-1 px-1.5 py-0.5 rounded-full bg-black/10">concedida pela coordenação</span>
+                    )}
+                    {b.automatica && !b.apenasAdmin && (
+                      <span className="text-[9px] mt-1 px-1.5 py-0.5 rounded-full bg-black/10">automática</span>
+                    )}
                   </div>
                 )
               })}

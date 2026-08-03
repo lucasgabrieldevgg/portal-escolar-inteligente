@@ -5,7 +5,8 @@ import { useApp, api } from '@/lib/store'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { Badge as BadgeUI } from '@/components/ui/badge'
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs'
-import { Award, Sparkles } from 'lucide-react'
+import { ScrollArea } from '@/components/ui/scroll-area'
+import { Award, Sparkles, Bot, Settings as SettingsIcon, Zap } from 'lucide-react'
 
 interface Badge {
   id: string
@@ -15,6 +16,9 @@ interface Badge {
   raridade: string
   tipo: string
   daXP: boolean
+  xpRecompensa: number
+  apenasAdmin: boolean
+  automatica: boolean
 }
 
 const RARIDADE_STYLE: Record<string, string> = {
@@ -48,7 +52,7 @@ export function BadgesView() {
   useEffect(() => {
     Promise.all([
       api<{ badges: Badge[] }>('/api/badges'),
-      api<{ badges: Badge[] }>('/api/me'),
+      api<{ badges: Badge[]; user: any }>('/api/me'),
     ]).then(([b, m]) => {
       setBadges(b.badges)
       setMinhas((m.badges || []).map((bg) => bg.id))
@@ -68,14 +72,17 @@ export function BadgesView() {
         </BadgeUI>
       </div>
 
-      <Card className="bg-emerald-50/50 border-emerald-200">
-        <CardContent className="p-3 text-xs text-emerald-900">
+      <Card className="bg-emerald-50/50 border-emerald-200 dark:bg-emerald-950/20">
+        <CardContent className="p-3 text-xs text-emerald-900 dark:text-emerald-200">
           <p className="font-semibold flex items-center gap-1 mb-1">
             <Sparkles className="w-3.5 h-3.5" /> Como funcionam as badges
           </p>
-          <p className="text-emerald-800">
+          <p className="text-emerald-800 dark:text-emerald-300">
             Badges <strong>Acadêmicas</strong> e de <strong>Contribuição</strong> dão XP e contam no perfil.
-            Badges <strong>Especiais</strong> (como Fundador do Portal) são reconhecimento puro — não dão XP nem entram no ranking, pois representam contribuição, não desempenho.
+            Badges <strong>Especiais</strong> são reconhecimento puro — não dão XP nem entram no ranking, pois representam contribuição, não desempenho.
+          </p>
+          <p className="mt-2 text-emerald-700 dark:text-emerald-400">
+            <span className="inline-flex items-center gap-1"><Bot className="w-3 h-3" /> Automática</span> = concedida pelo sistema. <span className="inline-flex items-center gap-1"><SettingsIcon className="w-3 h-3" /> Admin</span> = concedida pela coordenação.
           </p>
         </CardContent>
       </Card>
@@ -111,9 +118,24 @@ export function BadgesView() {
                           <div className="text-4xl mb-2">{b.icone}</div>
                           <p className="font-semibold text-sm leading-tight">{b.nome}</p>
                           <p className="text-[10px] opacity-80 mt-1">{RARIDADE_LABEL[b.raridade]}</p>
-                          {!b.daXP && (
-                            <p className="text-[10px] mt-1 italic opacity-70">Não dá XP</p>
-                          )}
+                          <p className="text-[10px] opacity-70 mt-1 line-clamp-2 h-8">{b.descricao}</p>
+                          <div className="flex flex-wrap items-center justify-center gap-1 mt-1">
+                            {b.daXP && b.xpRecompensa > 0 && (
+                              <span className="inline-flex items-center gap-0.5 text-[9px] px-1.5 py-0.5 rounded-full bg-black/10">
+                                <Zap className="w-2.5 h-2.5" /> +{b.xpRecompensa} XP
+                              </span>
+                            )}
+                            {b.automatica && (
+                              <span className="inline-flex items-center gap-0.5 text-[9px] px-1.5 py-0.5 rounded-full bg-black/10">
+                                <Bot className="w-2.5 h-2.5" /> auto
+                              </span>
+                            )}
+                            {b.apenasAdmin && (
+                              <span className="inline-flex items-center gap-0.5 text-[9px] px-1.5 py-0.5 rounded-full bg-black/10">
+                                <SettingsIcon className="w-2.5 h-2.5" /> admin
+                              </span>
+                            )}
+                          </div>
                           {desbloqueada && (
                             <BadgeUI className="mt-2 bg-white/40 text-foreground hover:bg-white/40 text-[10px]">
                               Desbloqueada
@@ -123,6 +145,11 @@ export function BadgesView() {
                       </Card>
                     )
                   })}
+                {badges.filter((b) => b.tipo === tipo).length === 0 && (
+                  <div className="col-span-full text-center py-12 text-sm text-muted-foreground">
+                    Nenhuma badge deste tipo ainda.
+                  </div>
+                )}
               </div>
             </TabsContent>
           ))}

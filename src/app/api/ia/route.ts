@@ -1,14 +1,16 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { db } from '@/lib/db'
+import { db, garantirBanco } from '@/lib/db'
 import { requireUser, hojeISO } from '@/lib/auth'
-import ZAI from 'z-ai-web-dev-sdk'
+import { chat } from '@/lib/ia'
+import { pesquisarWikipedia, precisaPesquisaWiki, formatarContextoWiki } from '@/lib/wikipedia'
+import { detectarFerramentas, formatarFerramentas } from '@/lib/ferramentas'
 
-const SYSTEM_PROMPT = `Você é o assistente de IA do Portal Escolar Inteligente, uma plataforma escolar brasileira.
+const SYSTEM_PROMPT = `Você é o assistente de IA do Portal Escolar Inteligente, uma plataforma escolar brasileira da Escola Estadual Professora Eunice Souza dos Santos, em Rondonópolis-MT.
 
 Seu papel:
 - Ajudar alunos a estudar conteúdos escolares (matemática, história, português, ciências, etc.)
 - Resumir materiais que os professores passaram (slides, textos, PDFs)
-- Explicar conceitos de forma didática e simples, adequada para alunos do 6º ano ao 3º ano do Ensino Médio
+- Explicar conceitos de forma didática e simples, adequada para alunos do 6º ano ao 9º ano do Ensino Fundamental
 - Sugerir exercícios e técnicas de estudo
 - Nunca dar a resposta direta a uma pergunta de exercício sem antes ajudar o aluno a pensar
 
@@ -20,11 +22,13 @@ Regras importantes:
 - Seja amigável, breve e direto. Use exemplos do cotidiano quando ajudar.
 - Se a pergunta não tiver relação com educação escolar, educadamente recuse e explique seu propósito.
 
-Quando resumir um material, organize em tópicos com títulos curtos e bullets.`
+Quando resumir um material, organize em tópicos com títulos curtos e bullets.
+Quando receber uma imagem (foto de exercício, slide, livro), descreva o que vê e ajude o aluno a entender — sem dar a resposta direta se for uma questão avaliativa.`
 
 export async function POST(req: NextRequest) {
+  await garantirBanco()
   const user = await requireUser()
-  const { pergunta, historico } = await req.json()
+  const { pergunta, historico, imagemBase64 } = await req.json()
 
   if (!pergunta || typeof pergunta !== 'string' || pergunta.trim().length === 0) {
     return NextResponse.json({ error: 'Pergunta obrigatória' }, { status: 400 })
@@ -57,9 +61,28 @@ export async function POST(req: NextRequest) {
     data: { iaUsadasHoje: { increment: 1 } },
   })
 
+  // 1. Pesquisa na Wikipedia se necessário
+  let contextoWiki = ''
+  if (precisaPesquisaWiki(pergunta)) {
+    try {
+      const resultados = await pesquisarWikipedia(pergunta, 2)
+      contextoWiki = formatarContextoWiki(resultados)
+    } catch (e) {
+      console.warn('[ia] Wikipedia falhou:', e)
+    }
+  }
+
+  // 2. Detecta ferramentas relevantes
+  const ferramentas = detectarFerramentas(pergunta)
+  const textoFerramentas = formatarFerramentas(ferramentas)
+
+  // 3. Monta mensagens
   const mensagens: any[] = [
     { role: 'system', content: SYSTEM_PROMPT },
   ]
+  if (contextoWiki) {
+    mensagens.push({ role: 'system', content: contextoWiki })
+  }
   if (Array.isArray(historico)) {
     for (const m of historico.slice(-10)) {
       if (m.role === 'user' || m.role === 'assistant') {
@@ -70,20 +93,21 @@ export async function POST(req: NextRequest) {
   mensagens.push({ role: 'user', content: pergunta })
 
   try {
-    const zai = await ZAI.create()
-    const completion = await zai.chat.completions.create({
-      messages: mensagens,
-      thinking: { type: 'disabled' },
+    let resposta = await chat(mensagens, {
       temperature: 0.5,
-      max_tokens: 1200,
+      maxTokens: 1200,
+      imagemBase64: imagemBase64 || undefined,
     })
-
-    const resposta = completion.choices[0]?.message?.content || 'Não consegui gerar uma resposta. Tente reformular sua pergunta.'
+    // Acrescenta sugestão de ferramentas externas (não consome tokens da IA)
+    if (textoFerramentas) {
+      resposta = resposta + textoFerramentas
+    }
 
     return NextResponse.json({
       resposta,
       usosRestantes: Math.max(0, user.iaLimiteDiario - user.iaUsadasHoje - 1),
       limiteDiario: user.iaLimiteDiario,
+      ferramentas,
     })
   } catch (err: any) {
     // Em caso de erro da IA, devolve o uso para o aluno

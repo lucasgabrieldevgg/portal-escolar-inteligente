@@ -1,9 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { db } from '@/lib/db'
+import { db, garantirBanco } from '@/lib/db'
 import { requireUser } from '@/lib/auth'
 
 // GET /api/tarefas?turmaId=xxx -> tarefas de uma turma (ou todas as do usuário)
 export async function GET(req: NextRequest) {
+  await garantirBanco()
   const user = await requireUser()
   const { searchParams } = new URL(req.url)
   const turmaId = searchParams.get('turmaId')
@@ -32,6 +33,7 @@ export async function GET(req: NextRequest) {
 
 // POST /api/tarefas -> professor cria tarefa
 export async function POST(req: NextRequest) {
+  await garantirBanco()
   const user = await requireUser()
   if (user.role !== 'PROFESSOR' && user.role !== 'COORDENACAO' && user.role !== 'ADMIN') {
     return NextResponse.json({ error: 'Sem permissão' }, { status: 403 })

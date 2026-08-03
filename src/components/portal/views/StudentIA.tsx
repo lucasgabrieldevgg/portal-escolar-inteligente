@@ -2,18 +2,26 @@
 
 import { useEffect, useRef, useState } from 'react'
 import { useApp, api } from '@/lib/store'
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
+import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
 import { Badge as BadgeUI } from '@/components/ui/badge'
-import { Progress } from '@/components/ui/progress'
 import { ScrollArea } from '@/components/ui/scroll-area'
-import { Bot, Send, Sparkles, AlertTriangle, Lightbulb, BookOpen, ListChecks, Trash2, Zap } from 'lucide-react'
+import { Bot, Send, Sparkles, Lightbulb, BookOpen, ListChecks, Trash2, Zap, ImagePlus, X, Wrench } from 'lucide-react'
 import { toast } from 'sonner'
 
 interface Msg {
   role: 'user' | 'assistant'
   content: string
+  temImagem?: boolean
+}
+
+interface FerramentaSugerida {
+  id: string
+  nome: string
+  url: string
+  descricao: string
+  icone: string
 }
 
 const SUGESTOES = [
@@ -30,6 +38,9 @@ export function StudentIA() {
   const [enviando, setEnviando] = useState(false)
   const [usosRestantes, setUsosRestantes] = useState<number | null>(null)
   const [limiteDiario, setLimiteDiario] = useState<number>(15)
+  const [imagem, setImagem] = useState<string | null>(null) // base64 data URL
+  const [ferramentas, setFerramentas] = useState<FerramentaSugerida[]>([])
+  const fileInputRef = useRef<HTMLInputElement>(null)
   const scrollRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -45,31 +56,51 @@ export function StudentIA() {
     }
   }, [mensagens])
 
+  function onFileChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0]
+    if (!file) return
+    if (!file.type.startsWith('image/')) {
+      toast.error('Selecione um arquivo de imagem.')
+      return
+    }
+    if (file.size > 4 * 1024 * 1024) {
+      toast.error('Imagem muito grande (máx. 4MB).')
+      return
+    }
+    const reader = new FileReader()
+    reader.onload = () => {
+      setImagem(reader.result as string)
+    }
+    reader.readAsDataURL(file)
+  }
+
   async function enviar(pergunta?: string) {
     const perguntaFinal = (pergunta ?? input).trim()
-    if (!perguntaFinal || enviando) return
+    if ((!perguntaFinal && !imagem) || enviando) return
 
     if (usosRestantes !== null && usosRestantes <= 0) {
       toast.error('Você atingiu o limite diário de perguntas à IA. Volte amanhã!')
       return
     }
 
-    const novasMsgs: Msg[] = [...mensagens, { role: 'user', content: perguntaFinal }]
+    const novasMsgs: Msg[] = [...mensagens, { role: 'user', content: perguntaFinal || '(imagem anexada)', temImagem: !!imagem }]
     setMensagens(novasMsgs)
     setInput('')
     setEnviando(true)
+    setFerramentas([])
 
     try {
-      const data = await api<{ resposta: string; usosRestantes: number; limiteDiario: number }>('/api/ia', {
+      const body: any = { pergunta: perguntaFinal, historico: mensagens.slice(-6) }
+      if (imagem) body.imagemBase64 = imagem
+      const data = await api<{ resposta: string; usosRestantes: number; limiteDiario: number; ferramentas?: FerramentaSugerida[] }>('/api/ia', {
         method: 'POST',
-        body: JSON.stringify({
-          pergunta: perguntaFinal,
-          historico: mensagens.slice(-6),
-        }),
+        body: JSON.stringify(body),
       })
       setMensagens([...novasMsgs, { role: 'assistant', content: data.resposta }])
       setUsosRestantes(data.usosRestantes)
       setLimiteDiario(data.limiteDiario)
+      setFerramentas(data.ferramentas || [])
+      setImagem(null)
     } catch (e: any) {
       const msg = e.message || 'Erro ao falar com a IA'
       if (msg.includes('limite')) {
@@ -78,7 +109,6 @@ export function StudentIA() {
       } else {
         toast.error(msg)
       }
-      // Remove a mensagem do usuário que não foi respondida
       setMensagens(mensagens)
     } finally {
       setEnviando(false)
@@ -86,8 +116,6 @@ export function StudentIA() {
   }
 
   if (!user) return null
-
-  const pct = limiteDiario > 0 ? ((usosRestantes ?? 0) / limiteDiario) * 100 : 0
 
   return (
     <div className="max-w-4xl mx-auto space-y-4">
@@ -112,19 +140,18 @@ export function StudentIA() {
         </Card>
       </div>
 
-      {/* Regras */}
-      <div className="bg-emerald-50 border border-emerald-200 rounded-lg p-3 text-xs text-emerald-900">
+      <div className="bg-emerald-50 border border-emerald-200 dark:bg-emerald-950/20 dark:border-emerald-900 rounded-lg p-3 text-xs text-emerald-900 dark:text-emerald-200">
         <p className="font-semibold flex items-center gap-1 mb-1">
           <Sparkles className="w-3.5 h-3.5" /> Como usar bem a IA
         </p>
-        <ul className="space-y-0.5 list-disc pl-4 text-emerald-800">
+        <ul className="space-y-0.5 list-disc pl-4 text-emerald-800 dark:text-emerald-300">
           <li>A IA ajuda a <strong>entender</strong>, não faz a tarefa por você.</li>
           <li>Pergunte sobre conteúdos das aulas, peça resumos e explicações.</li>
+          <li>Pode anexar foto de exercício, slide ou página de livro.</li>
           <li>O limite diário existe para controlar custos — use com propósito.</li>
         </ul>
       </div>
 
-      {/* Chat */}
       <Card className="flex flex-col h-[60vh] min-h-[400px]">
         <ScrollArea className="flex-1 p-4" ref={scrollRef as any}>
           <div className="space-y-4">
@@ -142,7 +169,7 @@ export function StudentIA() {
                       <button
                         key={i}
                         onClick={() => enviar(s.pergunta)}
-                        className="text-left p-3 rounded-lg border hover:border-emerald-400 hover:bg-emerald-50/50 transition-colors text-sm"
+                        className="text-left p-3 rounded-lg border hover:border-emerald-400 hover:bg-emerald-50/50 dark:hover:bg-emerald-950/20 transition-colors text-sm"
                       >
                         <Icon className="w-4 h-4 text-emerald-600 mb-1.5" />
                         <p className="font-medium">{s.label}</p>
@@ -164,6 +191,11 @@ export function StudentIA() {
                       : 'bg-muted text-foreground rounded-bl-sm'
                   }`}
                 >
+                  {m.temImagem && (
+                    <div className="mb-1 inline-flex items-center gap-1 text-[10px] bg-white/20 rounded px-1.5 py-0.5">
+                      <ImagePlus className="w-3 h-3" /> imagem anexada
+                    </div>
+                  )}
                   {m.content}
                 </div>
               </div>
@@ -177,11 +209,58 @@ export function StudentIA() {
                 </div>
               </div>
             )}
+            {ferramentas.length > 0 && (
+              <div className="flex justify-start">
+                <div className="bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-900 rounded-xl p-3 max-w-[85%]">
+                  <p className="text-[10px] font-semibold text-amber-900 dark:text-amber-200 flex items-center gap-1 mb-1">
+                    <Wrench className="w-3 h-3" /> Ferramentas que podem ajudar
+                  </p>
+                  <div className="space-y-1">
+                    {ferramentas.map((f) => (
+                      <a
+                        key={f.id}
+                        href={f.url}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="block text-xs text-amber-800 dark:text-amber-300 hover:underline"
+                      >
+                        {f.icone} <strong>{f.nome}</strong> — {f.descricao}
+                      </a>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
         </ScrollArea>
 
         <div className="border-t p-3">
+          {imagem && (
+            <div className="mb-2 flex items-center gap-2 p-2 rounded-lg bg-muted/50">
+              <img src={imagem} alt="preview" className="w-12 h-12 object-cover rounded" />
+              <span className="text-xs text-muted-foreground flex-1">Imagem anexada</span>
+              <Button size="icon" variant="ghost" className="h-7 w-7" onClick={() => setImagem(null)}>
+                <X className="w-3.5 h-3.5" />
+              </Button>
+            </div>
+          )}
           <div className="flex gap-2">
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/*"
+              className="hidden"
+              onChange={onFileChange}
+            />
+            <Button
+              variant="outline"
+              size="icon"
+              className="h-11 w-11 flex-shrink-0"
+              onClick={() => fileInputRef.current?.click()}
+              title="Anexar imagem"
+            >
+              <ImagePlus className="w-4 h-4" />
+            </Button>
             <Textarea
               placeholder="Digite sua pergunta..."
               value={input}
@@ -197,7 +276,7 @@ export function StudentIA() {
             />
             <Button
               onClick={() => enviar()}
-              disabled={enviando || !input.trim()}
+              disabled={enviando || (!input.trim() && !imagem)}
               size="icon"
               className="h-11 w-11 flex-shrink-0"
             >
@@ -208,7 +287,7 @@ export function StudentIA() {
             <span>Enter para enviar · Shift+Enter para nova linha</span>
             {mensagens.length > 0 && (
               <button
-                onClick={() => setMensagens([])}
+                onClick={() => { setMensagens([]); setFerramentas([]) }}
                 className="hover:text-foreground inline-flex items-center gap-1"
               >
                 <Trash2 className="w-3 h-3" /> Limpar

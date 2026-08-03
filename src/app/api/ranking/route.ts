@@ -1,17 +1,18 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { db } from '@/lib/db'
+import { db, garantirBanco } from '@/lib/db'
 import { requireUser } from '@/lib/auth'
 
 // GET /api/ranking?tipo=global|turno|turma&turno=MANHA&turmaId=xxx&limite=50
 export async function GET(req: NextRequest) {
+  await garantirBanco()
   const user = await requireUser()
   const { searchParams } = new URL(req.url)
   const tipo = searchParams.get('tipo') || 'global'
   const limite = Math.min(parseInt(searchParams.get('limite') || '50'), 200)
 
   const where: any = { role: 'ALUNO', ativo: true }
-  if (tipo === 'turno') {
-    where.turno = searchParams.get('turno') || user.turno
+  if (tipo === 'turno' || tipo === 'manha' || tipo === 'tarde') {
+    where.turno = tipo === 'manha' ? 'MANHA' : tipo === 'tarde' ? 'TARDE' : (searchParams.get('turno') || user.turno)
   } else if (tipo === 'turma') {
     where.turmaId = searchParams.get('turmaId') || user.turmaId
   }
@@ -25,7 +26,7 @@ export async function GET(req: NextRequest) {
       xpTotal: true,
       turma: { select: { nome: true, ano: true } },
       turno: true,
-      userBadges: { include: { badge: { select: { icone: true, raridade: true } } } },
+      avatarConfig: true,
     },
     orderBy: [{ xp: 'desc' }, { name: 'asc' }],
     take: limite,

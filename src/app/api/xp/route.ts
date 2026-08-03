@@ -1,10 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { db } from '@/lib/db'
+import { db, garantirBanco } from '@/lib/db'
 import { requireRole } from '@/lib/auth'
 
 // POST /api/xp/conceder -> professor ou coordenação dá XP manualmente
 // body: { userId, quantidade, motivo }
 export async function POST(req: NextRequest) {
+  await garantirBanco()
   const user = await requireRole(['PROFESSOR', 'COORDENACAO', 'ADMIN'])
   const { userId, quantidade, motivo } = await req.json()
   if (!userId || !quantidade || !motivo) {

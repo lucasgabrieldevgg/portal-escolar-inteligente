@@ -1,9 +1,10 @@
 import { NextResponse } from 'next/server'
 import { cookies } from 'next/headers'
-import { db } from '@/lib/db'
+import { db, garantirBanco } from '@/lib/db'
 import { SESSION_COOKIE, destroySession, getSession } from '@/lib/auth'
 
 export async function POST() {
+  await garantirBanco()
   const sessao = await getSession()
   if (sessao) {
     await destroySession(sessao.token)

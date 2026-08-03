@@ -86,7 +86,7 @@ export function StudentHome() {
               <div className="flex items-center justify-between mb-2">
                 <span className="text-xs font-medium text-emerald-100">Nível {nivel}</span>
                 <span className="text-xs font-bold flex items-center gap-1">
-                  <Flame className="w-3 h-3" /> {user.sequenciaDias} dias
+                  <Flame className="w-3 h-3" /> {user.sequenciaDias} dias · {user.moedinhas || 0} moedinhas
                 </span>
               </div>
               <div className="flex items-baseline gap-1 mb-2">

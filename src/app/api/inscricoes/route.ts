@@ -1,10 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { db } from '@/lib/db'
+import { db, garantirBanco } from '@/lib/db'
 import { requireUser, requireRole } from '@/lib/auth'
 import ZAI from 'z-ai-web-dev-sdk'
 
 // GET /api/inscricoes -> lista inscrições (coordenação) ou a minha (aluno)
 export async function GET() {
+  await garantirBanco()
   const user = await requireUser()
   const where = user.role === 'ALUNO' ? { userId: user.id } : {}
   const inscricoes = await db.inscricaoDev.findMany({
@@ -19,6 +20,7 @@ export async function GET() {
 
 // POST /api/inscricoes -> aluno se inscreve
 export async function POST(req: NextRequest) {
+  await garantirBanco()
   const user = await requireUser()
   if (user.role !== 'ALUNO') {
     return NextResponse.json({ error: 'Apenas alunos podem se inscrever' }, { status: 403 })

@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as SonnerToaster } from "@/components/ui/sonner";
+import { ThemeProvider } from "@/components/portal/ThemeProvider";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -17,7 +18,7 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "Portal Escolar Inteligente",
   description:
-    "Plataforma escolar com assistente de IA, sistema de XP, rankings, badges e programa de colaboradores. Demonstração do projeto.",
+    "Plataforma escolar com assistente de IA, sistema de XP, rankings, badges e programa de colaboradores. Escola Estadual Professora Eunice Souza dos Santos - Rondonópolis-MT.",
   keywords: [
     "portal escolar",
     "educação",
@@ -40,7 +41,9 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased bg-background text-foreground`}
       >
-        {children}
+        <ThemeProvider attribute="class" defaultTheme="light" enableSystem={false}>
+          {children}
+        </ThemeProvider>
         <Toaster />
         <SonnerToaster position="top-right" richColors />
       </body>

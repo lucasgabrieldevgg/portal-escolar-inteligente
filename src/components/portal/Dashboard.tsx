@@ -3,13 +3,17 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useApp, api } from '@/lib/store'
 import { Button } from '@/components/ui/button'
-import { ScrollArea } from '@/components/ui/scroll-area'
 import { Badge as BadgeUI } from '@/components/ui/badge'
+import { ScrollArea } from '@/components/ui/scroll-area'
+import { Avatar } from './Avatar'
+import { ThemeToggle } from './ThemeToggle'
+import { SobreEscolaButton } from './SobreEscolaButton'
 import { toast } from 'sonner'
 import {
   GraduationCap, Home, Bell, BookOpen, Bot, Trophy, User as UserIcon,
-  Award, Bug, Rocket, LogOut, Users, ClipboardCheck, Sparkles,
-  Megaphone, ShieldAlert, ClipboardList, Menu,
+  Award, Bug, Rocket, LogOut, Users, ClipboardCheck, Sparkles, Coins,
+  Megaphone, ShieldAlert, ClipboardList, Menu, Store, Library, Palette,
+  Info, Settings, Cog, BadgeCheck, Wand2,
 } from 'lucide-react'
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet'
 import { StudentHome } from './views/StudentHome'
@@ -21,12 +25,20 @@ import { PerfilView } from './views/PerfilView'
 import { BadgesView } from './views/BadgesView'
 import { BugsView } from './views/BugsView'
 import { InscricaoDevView } from './views/InscricaoDevView'
+import { LojaView } from './views/LojaView'
+import { BibliotecaView } from './views/BibliotecaView'
+import { InfoView } from './views/InfoView'
 import { ProfTurmas } from './views/ProfTurmas'
+import { ProfAvisos } from './views/ProfAvisos'
 import { ProfTarefas } from './views/ProfTarefas'
 import { ProfCorrigir } from './views/ProfCorrigir'
 import { ProfXP } from './views/ProfXP'
+import { ProfIA } from './views/ProfIA'
 import { CoordAvisos } from './views/CoordAvisos'
-import { CoordUsuarios } from './views/CoordUsuarios'
+import { CoordContas } from './views/CoordContas'
+import { CoordBadgesView } from './views/CoordBadgesView'
+import { CoordMoedinhas } from './views/CoordMoedinhas'
+import { CoordManutencao } from './views/CoordManutencao'
 import { CoordBugs } from './views/CoordBugs'
 import { CoordInscricoes } from './views/CoordInscricoes'
 import { CoordTarefas } from './views/CoordTarefas'
@@ -43,39 +55,54 @@ const NAV_ALUNO: NavItem[] = [
   { id: 'tarefas', label: 'Tarefas', icon: BookOpen },
   { id: 'ia', label: 'Assistente IA', icon: Bot },
   { id: 'ranking', label: 'Ranking', icon: Trophy },
+  { id: 'loja', label: 'Loja', icon: Store },
+  { id: 'biblioteca', label: 'Biblioteca', icon: Library },
+  { id: 'avatar', label: 'Meu Avatar', icon: Palette },
   { id: 'badges', label: 'Galeria de Badges', icon: Award },
   { id: 'bugs', label: 'Caça aos Bugs', icon: Bug },
   { id: 'inscricao-dev', label: 'Quero colaborar', icon: Rocket },
+  { id: 'info', label: 'Sobre o Portal', icon: Info },
   { id: 'perfil', label: 'Meu Perfil', icon: UserIcon },
 ]
 
 const NAV_PROF: NavItem[] = [
   { id: 'prof-turmas', label: 'Minhas Turmas', icon: Users },
+  { id: 'prof-avisos', label: 'Avisos de Turma', icon: Megaphone },
   { id: 'prof-tarefas', label: 'Tarefas', icon: BookOpen },
   { id: 'prof-corrigir', label: 'Corrigir Entregas', icon: ClipboardCheck },
   { id: 'prof-xp', label: 'Conceder XP', icon: Sparkles },
+  { id: 'prof-ia', label: 'Assistente IA', icon: Bot },
 ]
 
 const NAV_COORD: NavItem[] = [
   { id: 'coord-avisos', label: 'Avisos Oficiais', icon: Megaphone },
-  { id: 'coord-usuarios', label: 'Usuários', icon: Users },
+  { id: 'coord-contas', label: 'Contas', icon: Users },
   { id: 'coord-tarefas', label: 'Tarefas', icon: ClipboardList },
+  { id: 'coord-badges', label: 'Badges', icon: BadgeCheck },
+  { id: 'coord-moedinhas', label: 'Moedinhas', icon: Coins },
   { id: 'coord-bugs', label: 'Bugs Reportados', icon: ShieldAlert },
   { id: 'coord-inscricoes', label: 'Inscrições Dev', icon: Rocket },
+  { id: 'coord-manutencao', label: 'Manutenção', icon: Settings },
+  { id: 'info', label: 'Sobre o Portal', icon: Info },
+]
+
+const NAV_BIB: NavItem[] = [
+  { id: 'bib-resumos', label: 'Resumos da Biblioteca', icon: Library },
+  { id: 'info', label: 'Sobre o Portal', icon: Info },
 ]
 
 export function Dashboard() {
   const { user, view, setView, logout, setUser } = useApp()
   const [mobileOpen, setMobileOpen] = useState(false)
 
-  const navItems = useMemo(() => {
+  const navItems = useMemo<NavItem[]>(() => {
     if (user?.role === 'ALUNO') return NAV_ALUNO
     if (user?.role === 'PROFESSOR') return NAV_PROF
+    if (user?.role === 'BIBLIOTECARIO') return NAV_BIB
     if (user?.role === 'COORDENACAO' || user?.role === 'ADMIN') return NAV_COORD
     return []
   }, [user])
 
-  // Garante que a view atual pertence ao role do usuário
   useEffect(() => {
     if (navItems.length > 0 && !navItems.find((n) => n.id === view)) {
       setView(navItems[0].id)
@@ -106,14 +133,24 @@ export function Dashboard() {
       case 'badges': return <BadgesView />
       case 'bugs': return <BugsView onXpGained={refreshUser} />
       case 'inscricao-dev': return <InscricaoDevView />
+      case 'loja': return <LojaView onComprou={refreshUser} />
+      case 'biblioteca': return <BibliotecaView />
+      case 'bib-resumos': return <BibliotecaView />
+      case 'avatar': return <PerfilView userId={user?.id || ''} editAvatar />
+      case 'info': return <InfoView />
       // professor
       case 'prof-turmas': return <ProfTurmas />
+      case 'prof-avisos': return <ProfAvisos />
       case 'prof-tarefas': return <ProfTarefas />
       case 'prof-corrigir': return <ProfCorrigir onXpGained={refreshUser} />
       case 'prof-xp': return <ProfXP onXpGained={refreshUser} />
+      case 'prof-ia': return <ProfIA />
       // coordenacao
       case 'coord-avisos': return <CoordAvisos />
-      case 'coord-usuarios': return <CoordUsuarios />
+      case 'coord-contas': return <CoordContas />
+      case 'coord-badges': return <CoordBadgesView />
+      case 'coord-moedinhas': return <CoordMoedinhas />
+      case 'coord-manutencao': return <CoordManutencao />
       case 'coord-bugs': return <CoordBugs onAvaliado={refreshUser} />
       case 'coord-inscricoes': return <CoordInscricoes />
       case 'coord-tarefas': return <CoordTarefas />
@@ -165,9 +202,7 @@ export function Dashboard() {
 
       <div className="p-3 border-t border-sidebar-border">
         <div className="flex items-center gap-2 p-2 rounded-lg bg-sidebar-accent/50 mb-2">
-          <div className="w-9 h-9 rounded-full bg-gradient-to-br from-emerald-400 to-amber-400 flex items-center justify-center font-bold text-sm">
-            {user?.name.charAt(0)}
-          </div>
+          <Avatar config={user?.avatarConfig} name={user?.name} size="sm" />
           <div className="flex-1 min-w-0">
             <p className="text-xs font-semibold truncate text-sidebar-foreground">{user?.name}</p>
             <p className="text-[10px] text-sidebar-foreground/60 truncate">
@@ -175,7 +210,11 @@ export function Dashboard() {
                 ? `${user?.turma?.nome || ''} · ${user?.turno === 'MANHA' ? 'Manhã' : 'Tarde'}`
                 : user?.role === 'PROFESSOR'
                 ? 'Professor(a)'
-                : 'Coordenação'}
+                : user?.role === 'BIBLIOTECARIO'
+                ? 'Bibliotecário(a)'
+                : user?.role === 'COORDENACAO'
+                ? 'Coordenação'
+                : 'Administrador'}
             </p>
           </div>
         </div>
@@ -188,19 +227,16 @@ export function Dashboard() {
 
   return (
     <div className="min-h-screen flex bg-background">
-      {/* Sidebar desktop */}
       <aside className="hidden lg:flex w-64 flex-shrink-0 bg-sidebar text-sidebar-foreground">
         {sidebarContent}
       </aside>
 
-      {/* Sidebar mobile */}
       <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
         <SheetContent side="left" className="w-72 p-0 bg-sidebar text-sidebar-foreground">
           {sidebarContent}
         </SheetContent>
       </Sheet>
 
-      {/* Conteúdo */}
       <div className="flex-1 flex flex-col min-w-0">
         <header className="border-b bg-card h-14 flex items-center justify-between px-4 sticky top-0 z-10">
           <div className="flex items-center gap-2">
@@ -218,16 +254,20 @@ export function Dashboard() {
 
           <div className="flex items-center gap-2">
             {user?.role === 'ALUNO' && (
-              <BadgeUI className="bg-amber-100 text-amber-900 hover:bg-amber-100 border-amber-200">
-                <Sparkles className="w-3 h-3 mr-1" />
-                {user.xp} XP
-              </BadgeUI>
+              <>
+                <BadgeUI className="bg-amber-100 text-amber-900 hover:bg-amber-100 border-amber-200">
+                  <Sparkles className="w-3 h-3 mr-1" />
+                  {user.xp} XP
+                </BadgeUI>
+                <BadgeUI className="bg-emerald-100 text-emerald-900 hover:bg-emerald-100 border-emerald-200">
+                  <Coins className="w-3 h-3 mr-1" />
+                  {user.moedinhas || 0}
+                </BadgeUI>
+              </>
             )}
-            <div className="hidden sm:flex items-center gap-2">
-              <div className="w-8 h-8 rounded-full bg-gradient-to-br from-emerald-400 to-amber-400 flex items-center justify-center font-bold text-xs">
-                {user?.name.charAt(0)}
-              </div>
-            </div>
+            <SobreEscolaButton />
+            <ThemeToggle />
+            <Avatar config={user?.avatarConfig} name={user?.name} size="sm" className="hidden sm:flex" />
           </div>
         </header>
 
@@ -237,10 +277,12 @@ export function Dashboard() {
 
         <footer className="border-t bg-card py-3 mt-auto">
           <div className="container mx-auto px-4 text-center text-[11px] text-muted-foreground">
-            Demonstração · Portal Escolar Inteligente · MVP
+            Portal Escolar Inteligente · Escola Est. Profª Eunice Souza dos Santos · Rondonópolis-MT
           </div>
         </footer>
       </div>
     </div>
   )
 }
+
+export { Cog, Wand2 } // evita warning de import não usado

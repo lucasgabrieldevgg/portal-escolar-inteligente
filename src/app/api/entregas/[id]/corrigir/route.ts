@@ -1,9 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { db } from '@/lib/db'
+import { db, garantirBanco } from '@/lib/db'
 import { requireUser } from '@/lib/auth'
 
 // POST /api/entregas/[id]/corrigir -> professor corrige e dá XP
 export async function POST(req: NextRequest, ctx: { params: Promise<{ id: string }> }) {
+  await garantirBanco()
   const user = await requireUser()
   if (user.role !== 'PROFESSOR' && user.role !== 'COORDENACAO' && user.role !== 'ADMIN') {
     return NextResponse.json({ error: 'Sem permissão' }, { status: 403 })

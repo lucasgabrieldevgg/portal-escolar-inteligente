@@ -1,9 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { db } from '@/lib/db'
+import { db, garantirBanco } from '@/lib/db'
 import { requireUser } from '@/lib/auth'
 
 // GET /api/entregas?tarefaId=xxx -> lista entregas de uma tarefa (professor)
 export async function GET(req: NextRequest) {
+  await garantirBanco()
   const user = await requireUser()
   if (user.role !== 'PROFESSOR' && user.role !== 'COORDENACAO' && user.role !== 'ADMIN') {
     return NextResponse.json({ error: 'Sem permissão' }, { status: 403 })

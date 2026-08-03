@@ -1,9 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { db } from '@/lib/db'
+import { db, garantirBanco } from '@/lib/db'
 import { requireUser } from '@/lib/auth'
 
 // GET /api/bugs -> lista bugs reportados
 export async function GET() {
+  await garantirBanco()
   const user = await requireUser()
   const where = user.role === 'ALUNO' ? { userId: user.id } : {}
   const bugs = await db.bugReport.findMany({
@@ -16,6 +17,7 @@ export async function GET() {
 
 // POST /api/bugs -> aluno reporta bug
 export async function POST(req: NextRequest) {
+  await garantirBanco()
   const user = await requireUser()
   const { local, acao, ocorreu, esperado, categoria } = await req.json()
   if (!local || !acao || !ocorreu || !esperado) {

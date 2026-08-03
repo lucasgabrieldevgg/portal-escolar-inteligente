@@ -1,9 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { db } from '@/lib/db'
+import { db, garantirBanco } from '@/lib/db'
 import { requireUser } from '@/lib/auth'
 
 // POST /api/tarefas/[id]/entregar -> aluno entrega tarefa
 export async function POST(req: NextRequest, ctx: { params: Promise<{ id: string }> }) {
+  await garantirBanco()
   const user = await requireUser()
   if (user.role !== 'ALUNO') {
     return NextResponse.json({ error: 'Apenas alunos podem entregar tarefas' }, { status: 403 })
