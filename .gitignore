@@ -1,28 +1,16 @@
-# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
-
 # dependencies
 node_modules
 /.pnp
 .pnp.*
-.yarn/*
-!.yarn/patches
-!.yarn/plugins
-!.yarn/releases
-!.yarn/versions
-
-# testing
-/coverage
 
 # next.js
-/.next/
-/out/
+.next/
+out/
+build
+dist
 
 # production
-/build
-
-# misc
-.DS_Store
-*.pem
+/server.js
 
 # debug
 npm-debug.log*
@@ -30,25 +18,37 @@ yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
 
-# env files (can opt-in for committing if needed)
-.env*
+# env files
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# prisma
+/db/
+/prisma/migrations/dev.db*
 
 # vercel
 .vercel
 
+# misc
+.DS_Store
+*.pem
+Thumbs.db
 
-# typescript
-*.tsbuildinfo
-next-env.d.ts
-local-*
-.claude
-.z-ai-config
+# editor
+.vscode/*
+!.vscode/extensions.json
+.idea
+
+# logs
 *.log
 dev.log
-dev.out.log
-test
-prompt
-
 server.log
-# Skills directory
-/skills/
+
+# scripts output
+/scripts/output/
+
+# z-ai config
+.z-ai-config
