@@ -1,3 +1,37 @@
+# Portal Escolar Inteligente (Smart School Portal)
+
+> Gamified school platform with AI assistant, XP/coins, weekly rankings, badges, a skin shop and a library — built for a real school in Rondonópolis, MT, Brazil.
+
+**Live demo:** https://my-project-swart-nine-11.vercel.app · **License:** MIT
+
+## ✨ Features
+
+- 👥 **5 user roles** — student, teacher, librarian, coordination and admin
+- 🎮 **Gamification** — weekly XP ranking (resets every Monday), lifetime XP, virtual coins and a skin shop with 18 items (colors, gradients, borders, emojis)
+- 🤖 **Multi-model AI assistant** via OpenRouter (free text and vision models) + Wikipedia integration; didactic prompts for students, lesson-prep prompts for teachers
+- 📚 **Smart library** — students handwrite book summaries, the librarian photographs them and the AI transcribes and grades; a human always makes the final call
+- 🏅 **Badges, announcements (3 types), maintenance mode, account management, light/dark theme**
+
+## 🚀 Stack
+
+Next.js (App Router) · TypeScript · Prisma (SQLite) · Tailwind CSS + shadcn/ui · Zustand · OpenRouter
+
+## 📦 Run locally
+
+```bash
+bun install
+bunx prisma db push
+bun run dev
+```
+
+## ⚠️ Demo mode
+
+Login is **passwordless by design**: the login screen lists demo accounts so anyone can try each role (including admin). Data lives in SQLite and resets on server cold starts — this is a demonstration MVP, not hardened production software.
+
+---
+
+# 🇧🇷 Português (original)
+
 # Portal Escolar Inteligente
 
 Plataforma escolar com assistente de IA, sistema de XP/moedinhas, loja de skins, badges, biblioteca com validação por IA, ranking semanal e programa de caça aos bugs.
