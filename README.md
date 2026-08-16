@@ -1,223 +1,191 @@
 # Portal Escolar Inteligente (Smart School Portal)
 
-> Gamified school platform with AI assistant, XP/coins, weekly rankings, badges, a skin shop and a library — built for a real school in Rondonópolis, MT, Brazil.
+> School platform with an AI assistant, XP/coins system, skin shop, badges, AI-validated library, weekly ranking and a bug-hunting program.
 
-**Live demo:** https://my-project-swart-nine-11.vercel.app · **License:** MIT
+> **Status:** demonstration MVP · Built for Escola Estadual Professora Eunice Souza dos Santos (Rondonópolis, MT, Brazil)
 
-## ✨ Features
+[Leia em Português](README.pt-BR.md)
 
-- 👥 **5 user roles** — student, teacher, librarian, coordination and admin
-- 🎮 **Gamification** — weekly XP ranking (resets every Monday), lifetime XP, virtual coins and a skin shop with 18 items (colors, gradients, borders, emojis)
-- 🤖 **Multi-model AI assistant** via OpenRouter (free text and vision models) + Wikipedia integration; didactic prompts for students, lesson-prep prompts for teachers
-- 📚 **Smart library** — students handwrite book summaries, the librarian photographs them and the AI transcribes and grades; a human always makes the final call
-- 🏅 **Badges, announcements (3 types), maintenance mode, account management, light/dark theme**
-
-## 🚀 Stack
-
-Next.js (App Router) · TypeScript · Prisma (SQLite) · Tailwind CSS + shadcn/ui · Zustand · OpenRouter
-
-## 📦 Run locally
-
-```bash
-bun install
-bunx prisma db push
-bun run dev
-```
-
-## ⚠️ Demo mode
-
-Login is **passwordless by design**: the login screen lists demo accounts so anyone can try each role (including admin). Data lives in SQLite and resets on server cold starts — this is a demonstration MVP, not hardened production software.
-
----
-
-# 🇧🇷 Português (original)
-
-# Portal Escolar Inteligente
-
-Plataforma escolar com assistente de IA, sistema de XP/moedinhas, loja de skins, badges, biblioteca com validação por IA, ranking semanal e programa de caça aos bugs.
-
-> **Status**: MVP de demonstração · Desenvolvido para a Escola Estadual Professora Eunice Souza dos Santos (Rondonópolis-MT)
-
-## Demonstração online
+## Online demo
 
 **https://my-project-swart-nine-11.vercel.app**
 
-## Como usar
+## How to use
 
-1. Acesse a URL acima
-2. Clique em qualquer perfil de demonstração (sem senha)
-3. Explore o portal!
+1. Open the URL above
+2. Click any demo profile (no password)
+3. Explore the portal!
 
-### Perfis de demonstração
+### Demo profiles
 
-| Perfil | Email | Acesso |
-|--------|-------|--------|
-| Luke S. (Aluno) | luke.silva@portal.escola.br | IA, tarefas, ranking, loja, badges |
-| Profa. Ana (Professora) | ana.costa@portal.escola.br | Turmas, tarefas, corrigir, IA própria |
-| Sra. Helena (Bibliotecária) | biblioteca@portal.escola.br | Validar resumos com IA |
-| Profa. Marta (Coordenação) | marta.silva@portal.escola.br | Gerenciar contas, avisos, badges, moedinhas |
-| Administrador | admin@portal.escola.br | Tudo + modo manutenção |
+| Profile | Email | Access |
+|---------|-------|--------|
+| Luke S. (Student) | luke.silva@portal.escola.br | AI, tasks, ranking, shop, badges |
+| Ms. Ana (Teacher) | ana.costa@portal.escola.br | Classes, tasks, grading, own AI |
+| Ms. Helena (Librarian) | biblioteca@portal.escola.br | Validate summaries with AI |
+| Ms. Marta (Coordination) | marta.silva@portal.escola.br | Manage accounts, announcements, badges, coins |
+| Administrator | admin@portal.escola.br | Everything + maintenance mode |
 
-## Funcionalidades
+## Features
 
-### 5 perfis de acesso
-- **Aluno** — avisos, tarefas, IA, ranking, loja, biblioteca, badges, bugs, avatar
-- **Professor** — turmas, avisos de turma, tarefas, corrigir, conceder XP/moedinhas, IA própria
-- **Bibliotecário** — valida resumos de livros com ajuda da IA (foto do resumo à mão)
-- **Coordenação** — avisos oficiais, gerenciar contas, conceder badges/moedinhas, modo manutenção
-- **Admin** — tudo da coordenação + configurações do sistema
+### 5 access roles
+- **Student** — announcements, tasks, AI, ranking, shop, library, badges, bugs, avatar
+- **Teacher** — classes, class announcements, tasks, grading, grant XP/coins, own AI
+- **Librarian** — validates book summaries with AI help (photo of the handwritten summary)
+- **Coordination** — official announcements, manage accounts, grant badges/coins, maintenance mode
+- **Admin** — everything coordination does + system settings
 
-### Sistema de XP + Moedinhas (separados)
-- **XP semanal**: reseta toda segunda-feira (ranking competitivo)
-- **XP total**: histórico, nunca reseta (registrado no perfil)
-- **Moedinhas**: ganha em tarefas/biblioteca/bugs, gasta na loja de skins, nunca somem
-- Todo aluno começa com 50 moedinhas
+### XP + Coins system (separate)
+- **Weekly XP**: resets every Monday (competitive ranking)
+- **Total XP**: lifetime, never resets (shown on the profile)
+- **Coins**: earned from tasks/library/bugs, spent in the skin shop, never expire
+- Every student starts with 50 coins
 
-### IA Multi-modelo (OpenRouter)
-- **Modelo de texto**: `nvidia/nemotron-3-super-120b-a12b:free` (377B params, free)
-- **Modelo de visão**: `nvidia/nemotron-nano-12b-2-vl:free` (único free que lê imagem)
-- Aluno pode anexar imagem (ex: foto de exercício, slide, gráfico)
-- Bibliotecária pode enviar foto de resumo escrito à mão para análise
-- Fallback automático para z-ai-web-dev-sdk se OpenRouter falhar
-- Limite diário configurável (default: 15 perguntas/dia)
-- Wikipedia integrada (PT + EN com tradução)
-- System prompt didático (método socrático adaptado, exemplos do cotidiano)
-- Reformular textos com IA (avisos, descrição de badges) com undo/redo
+### Multi-model AI (OpenRouter)
+- **Text model**: `nvidia/nemotron-3-super-120b-a12b:free` (377B params, free)
+- **Vision model**: `nvidia/nemotron-nano-12b-2-vl:free` (the only free model that reads images)
+- Students can attach an image (e.g. a photo of an exercise, slide or chart)
+- The librarian can send a photo of a handwritten summary for analysis
+- Automatic fallback to z-ai-web-dev-sdk if OpenRouter fails
+- Configurable daily limit (default: 15 questions/day)
+- Wikipedia integration (PT + EN with translation)
+- Didactic system prompt (adapted Socratic method, everyday examples)
+- AI rewriting for texts (announcements, badge descriptions) with undo/redo
 
-### IA para Professores
-- System prompt específico: criar questões, rubricas, atividades, adaptar conteúdo
-- Sugestões prontas: criar questões, montar rubrica, sugerir atividade, adaptar para alunos com dificuldade
-- Não conta no limite dos alunos
+### Teacher AI
+- Dedicated system prompt: create questions, rubrics, activities, adapt content
+- Ready-made suggestions: create questions, build a rubric, suggest an activity, adapt for struggling students
+- Does not count towards the student limit
 
-### Biblioteca (resumo em papel + IA)
-- Aluno lê livro, escreve resumo **À MÃO em papel**, entrega na biblioteca
-- Bibliotecária tira **foto do resumo** e registra no sistema
-- IA analisa a foto e dá feedback:
-  - Transcreve o resumo automaticamente
-  - Detecta o nome do livro do cabeçalho
-  - Avalia legibilidade, qualidade, se parece copiado
-  - Recomendação (SIM/TALVEZ/NÃO)
-- Bibliotecária aprova ou recusa (decisão final é dela, IA só ajuda)
-- Se aprovado: +30 XP + 15 moedinhas + contagem para badges Leitor Bronze/Prata/Ouro
-- Aba "Conceder XP/Moedas" para premiar sem registrar resumo
+### Library (paper summary + AI)
+- Student reads a book, writes a summary **BY HAND on paper**, hands it in at the library
+- Librarian takes a **photo of the summary** and registers it in the system
+- The AI analyzes the photo and gives feedback:
+  - Automatically transcribes the summary
+  - Detects the book title from the header
+  - Assesses legibility, quality, whether it looks copied
+  - Recommendation (YES/MAYBE/NO)
+- The librarian approves or rejects (the final call is theirs, the AI only helps)
+- If approved: +30 XP + 15 coins + counts towards Bronze/Silver/Gold Reader badges
+- "Grant XP/Coins" tab to reward without registering a summary
 
-### Loja de Skins (18 itens)
-- **Cores** (7): sólidas, algumas grátis, outras 10-30 moedinhas
-- **Gradientes** (5): Pôr do Sol, Oceano, Galáxia, Arco-Íris — 50-200 moedinhas
-- **Frames/bordas** (2): Dourada, Prateada — 40 moedinhas
-- **Emojis premium** (5): Coroa, Diamante, Dragão — 5-180 moedinhas
-- Raridades: Comum, Rara, Épica, Lendária
+### Skin shop (18 items)
+- **Colors** (7): solid, some free, others 10–30 coins
+- **Gradients** (5): Sunset, Ocean, Galaxy, Rainbow — 50–200 coins
+- **Frames/borders** (2): Gold, Silver — 40 coins
+- **Premium emojis** (5): Crown, Diamond, Dragon — 5–180 coins
+- Rarities: Common, Rare, Epic, Legendary
 
-### Ranking Semanal
-- Reseta toda segunda-feira automaticamente
-- 4 abas: Global, Manhã, Tarde, Minha turma
-- Top 3 com medalhas (ouro/prata/bronze)
-- Clicar em qualquer pessoa abre o perfil completo
+### Weekly ranking
+- Resets automatically every Monday
+- 4 tabs: Global, Morning, Afternoon, My class
+- Top 3 with medals (gold/silver/bronze)
+- Click anyone to open their full profile
 
 ### Badges
-- 10 badges (sem "Fundador do Portal")
-- 3 categorias: Acadêmica, Contribuição, Especial
-- Badges Especiais não dão XP — representam contribuição
-- Badges Automáticas concedidas pelo sistema
-- Badges Admin só coordenação concede
-- Galeria com selos 🔒 Admin e Auto
-- Coordenação pode **criar badges personalizadas** com emoji picker (9 categorias) + reformular descrição com IA
+- 10 badges (no "Portal Founder")
+- 3 categories: Academic, Contribution, Special
+- Special badges give no XP — they represent contribution
+- Automatic badges granted by the system
+- Admin-only badges granted by coordination
+- Gallery with 🔒 Admin and Auto seals
+- Coordination can **create custom badges** with an emoji picker (9 categories) + AI-rewrite the description
 
-### Avisos (3 tipos)
-- **Oficiais** (coordenação): visíveis para todos, com categorias e destaques
-- **De turma** (professor ou coordenação): visíveis apenas para a turma selecionada
-- Reformulação com IA (4 tons: claro, formal, amigável, urgente) + undo/redo
+### Announcements (3 types)
+- **Official** (coordination): visible to everyone, with categories and highlights
+- **Class** (teacher or coordination): visible only to the selected class
+- AI rewriting (4 tones: clear, formal, friendly, urgent) + undo/redo
 
-### Modo Manutenção
-- Switch no painel da coordenação
-- Alunos/professores não conseguem fazer login quando ativo
-- Mensagem customizável
+### Maintenance mode
+- Switch in the coordination panel
+- Students/teachers cannot log in while active
+- Custom message
 
-### Gerenciamento de Contas (só coordenação/admin)
-- Criar conta: nome personalizado, cargo (Aluno, Professor, Bibliotecário, Coordenação, Admin)
-- Professor: seleciona matérias (12 predefinidas + customizada)
-- Aluno: seleciona turma (turno vem automático)
-- Editar: nome, cargo, turma, matérias, ativar/desativar
-- Resetar senha: gerar nova OU personalizada
-- Email gerado automaticamente: `nome.sobrenome@portal.escola.br`
+### Account management (coordination/admin only)
+- Create account: custom name, role (Student, Teacher, Librarian, Coordination, Admin)
+- Teacher: pick subjects (12 presets + custom)
+- Student: pick class (shift fills in automatically)
+- Edit: name, role, class, subjects, activate/deactivate
+- Reset password: generate a new one OR custom
+- Email generated automatically: `name.surname@portal.escola.br`
 
-### Menu Informações (escondido)
-- Colapsável no final do menu lateral
-- 3 sub-itens: Sobre a Escola, Sobre o Portal, Perguntas Frequentes
-- FAQ com 8 perguntas comuns
+### Info menu (hidden)
+- Collapsible at the bottom of the sidebar
+- 3 sub-items: About the School, About the Portal, FAQ
+- FAQ with 8 common questions
 
-### Tema claro/escuro
-- Toggle no header
-- Persiste no navegador
+### Light/dark theme
+- Toggle in the header
+- Persists in the browser
 
-## Stack técnica
+## Tech stack
 
-- **Next.js 16** com App Router (TypeScript)
-- **Prisma ORM** + SQLite (desenvolvimento e produção)
+- **Next.js 16** with App Router (TypeScript)
+- **Prisma ORM** + SQLite (development and production)
 - **Tailwind CSS 4** + **shadcn/ui**
-- **z-ai-web-dev-sdk** para fallback de IA
-- **OpenRouter** para modelos free (Nemotron 3 Super + Nemotron Nano 12B VL)
-- **Zustand** para estado no cliente
-- **next-themes** para tema claro/escuro
+- **z-ai-web-dev-sdk** as AI fallback
+- **OpenRouter** for free models (Nemotron 3 Super + Nemotron Nano 12B VL)
+- **Zustand** for client state
+- **next-themes** for light/dark theme
 
-## Como rodar localmente
+## Run locally
 
 ```bash
 bun install
-bun run db:push          # cria o banco SQLite
-bun run dev              # inicia o servidor
+bun run db:push          # creates the SQLite database
+bun run dev              # starts the server
 ```
 
-Abrir http://localhost:3000. Clique em qualquer perfil para entrar (sem senha).
+Open http://localhost:3000 and click any profile to log in (no password).
 
-## Deploy na Vercel
+## Deploy to Vercel
 
-1. Faça push do código para um repositório no GitHub
-2. No Vercel, importe o repositório
-3. Configurações:
+1. Push the code to a GitHub repository
+2. In Vercel, import the repository
+3. Settings:
    - Framework Preset: Next.js
    - Build Command: `bun run build`
    - Install Command: `bun install`
-4. Variáveis de ambiente:
+4. Environment variables:
    - `DATABASE_URL` = `file:/tmp/portal.db`
-   - `OPENROUTER_API_KEYS` = suas chaves do OpenRouter (opcional, tem fallback)
+   - `OPENROUTER_API_KEYS` = your OpenRouter keys (optional, there is a fallback)
 5. Deploy!
 
-O banco SQLite é criado automaticamente em `/tmp` no primeiro acesso e populado com dados de demonstração. Os dados persistem durante a sessão do servidor (cold starts podem resetar os dados).
+The SQLite database is created automatically in `/tmp` on first access and seeded with demo data. Data persists while the server session lives (cold starts may reset it).
 
-## Lista de modelos OpenRouter (todos free)
+## OpenRouter model list (all free)
 
-### Modelos de Texto
-| Modelo | Params | Contexto | Velocidade |
-|--------|--------|----------|------------|
-| `nvidia/nemotron-3-super-120b-a12b:free` | 377B | 262.144 | 71 t/s |
-| `nvidia/nemotron-3-nano-30b-a3b:free` | 50,1B | 256.000 | 123 t/s |
-| `nvidia/nemotron-nano-9b-v2:free` | 16,5B | 128.000 | 32 t/s |
-| `openai/gpt-oss-20b:free` | 11,3B | 131.072 | 22 t/s |
-| `google/gemma-4-31b:free` | 1,68B | 262.144 | 21 t/s |
-| `google/gemma-4-26b-a4b:free` | 16,8B | 262.144 | 14 t/s |
+### Text models
+| Model | Params | Context | Speed |
+|-------|--------|---------|-------|
+| `nvidia/nemotron-3-super-120b-a12b:free` | 377B | 262,144 | 71 t/s |
+| `nvidia/nemotron-3-nano-30b-a3b:free` | 50.1B | 256,000 | 123 t/s |
+| `nvidia/nemotron-nano-9b-v2:free` | 16.5B | 128,000 | 32 t/s |
+| `openai/gpt-oss-20b:free` | 11.3B | 131,072 | 22 t/s |
+| `google/gemma-4-31b:free` | 1.68B | 262,144 | 21 t/s |
+| `google/gemma-4-26b-a4b:free` | 16.8B | 262,144 | 14 t/s |
 
-### Modelo de Visão (imagem)
-| Modelo | Params | Contexto |
-|--------|--------|----------|
-| `nvidia/nemotron-nano-12b-2-vl:free` | 11,7B | 128.000 |
+### Vision (image) model
+| Model | Params | Context |
+|-------|--------|---------|
+| `nvidia/nemotron-nano-12b-2-vl:free` | 11.7B | 128,000 |
 
-## Para configurar suas próprias chaves OpenRouter
+## Setting up your own OpenRouter keys
 
-1. Acesse https://openrouter.ai
+1. Go to https://openrouter.ai
 2. Sign in → Keys → Create Key
-3. Copie a chave `sk-or-v1-...`
-4. No Vercel: Settings → Environment Variables → `OPENROUTER_API_KEYS`
+3. Copy the `sk-or-v1-...` key
+4. In Vercel: Settings → Environment Variables → `OPENROUTER_API_KEYS`
 
-Wikipedia API não precisa de chave (pública e gratuita).
+The Wikipedia API needs no key (public and free).
 
-## Sobre o projeto
+## About the project
 
-Idealizado por Lucas Gabriel, um aluno que percebeu que pensa melhor andando.
-Desenvolvido para a Escola Estadual Professora Eunice Souza dos Santos (Rondonópolis-MT).
+Created by Lucas Gabriel, a student who realized he thinks better while walking.
+Built for Escola Estadual Professora Eunice Souza dos Santos (Rondonópolis, MT).
 
-Este é um projeto de demonstração. Mesmo que a escola não adote, fica como portfólio no GitHub.
+This is a demonstration project. Even if the school doesn't adopt it, it stands as a portfolio piece on GitHub.
 
-## Licença
+## License
 
-MIT — sinta-se livre para usar, modificar e distribuir.
+MIT — feel free to use, modify and distribute.
