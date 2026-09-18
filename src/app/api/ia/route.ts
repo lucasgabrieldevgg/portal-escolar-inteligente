@@ -30,7 +30,22 @@ Você ajuda alunos do 6º ao 9º ano do Ensino Fundamental (idades 11-15 anos) a
 - Não responda conteúdo inadequado
 - Ao pesquisar na Wikipedia, cite a fonte com link`
 
+/* 🚦 Limite diário de IA (generoso) — mantém o site grátis no ar */
+const LIMITE_DIA = 60;
+const _HITS = new Map();
+function limiteEstourado(req: Request): boolean {
+  const hoje = new Date().toISOString().slice(0, 10);
+  for (const k of [..._HITS.keys()]) if (!k.startsWith(hoje)) _HITS.delete(k);
+  const ip = String(req.headers.get("x-forwarded-for") || "").split(",")[0].trim() || "anon";
+  const k = hoje + ":" + ip;
+  const n = _HITS.get(k) || 0;
+  if (n >= LIMITE_DIA) return true;
+  _HITS.set(k, n + 1);
+  return false;
+}
+
 export async function POST(req: NextRequest) {
+  if (limiteEstourado(req)) return NextResponse.json({ erro: "Você bateu o limite diário de IA (60 mensagens/dia) — volta amanhã! 💙" }, { status: 429 });
   await garantirBanco()
   const user = await requireUser()
   const { pergunta, historico, imagem } = await req.json()
