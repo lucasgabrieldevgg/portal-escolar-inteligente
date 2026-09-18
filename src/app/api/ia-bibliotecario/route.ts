@@ -4,7 +4,22 @@ import { requireRole } from '@/lib/auth'
 import { chat } from '@/lib/ia'
 
 // POST /api/ia-bibliotecario -> bibliotecário envia foto de resumo e IA analisa
+/* 🚦 Limite diário de IA (generoso) — mantém o site grátis no ar */
+const LIMITE_DIA = 40;
+const _HITS = new Map();
+function limiteEstourado(req: Request): boolean {
+  const hoje = new Date().toISOString().slice(0, 10);
+  for (const k of [..._HITS.keys()]) if (!k.startsWith(hoje)) _HITS.delete(k);
+  const ip = String(req.headers.get("x-forwarded-for") || "").split(",")[0].trim() || "anon";
+  const k = hoje + ":" + ip;
+  const n = _HITS.get(k) || 0;
+  if (n >= LIMITE_DIA) return true;
+  _HITS.set(k, n + 1);
+  return false;
+}
+
 export async function POST(req: NextRequest) {
+  if (limiteEstourado(req)) return NextResponse.json({ erro: "Limite diário de IA atingido (40/dia) — volta amanhã! 💙" }, { status: 429 });
   await garantirBanco()
   const user = await requireRole(['BIBLIOTECARIO', 'COORDENACAO', 'ADMIN'])
   const { imagemBase64, livroTitulo, alunoNome } = await req.json()
