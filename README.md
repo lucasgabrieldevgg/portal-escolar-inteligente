@@ -22,7 +22,7 @@ CI runs the full pipeline on every push (frozen lockfile → Prisma client → E
 
 ## Online demo
 
-**https://my-project-swart-nine-11.vercel.app**
+**https://portal-escolar-inteligente.vercel.app**
 
 ## How to use
 

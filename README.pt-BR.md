@@ -30,7 +30,7 @@ Plataforma escolar com assistente de IA, sistema de XP/moedinhas, loja de skins,
 
 ## Demonstração online
 
-**https://my-project-swart-nine-11.vercel.app**
+**https://portal-escolar-inteligente.vercel.app**
 
 ## Como usar
 
