@@ -6,6 +6,20 @@
 
 [Leia em Português](README.pt-BR.md)
 
+[![ci](https://github.com/lucasgabrieldevgg/portal-escolar-inteligente/actions/workflows/ci.yml/badge.svg)](https://github.com/lucasgabrieldevgg/portal-escolar-inteligente/actions/workflows/ci.yml)
+
+## 🧪 Development
+
+```
+bun install && bunx prisma generate && bun run lint && bun run build
+```
+
+CI runs the full pipeline on every push (frozen lockfile → Prisma client → ESLint → Next build as a real smoke test + secret-scan hygiene). MIT licensed.
+
+## 🎨 Identity — ESCOLA (operação CRA)
+
+**Nunito** (friendly, readable — the school gamified look) for the app, **JetBrains Mono** for numbers/XP/code. No template default fonts (Geist/Inter). The gold/silver/bronze medal gradients stay — they are the *metals*, not decoration.
+
 ## Online demo
 
 **https://my-project-swart-nine-11.vercel.app**

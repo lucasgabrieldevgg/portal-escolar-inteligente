@@ -6,6 +6,20 @@
 
 [Read in English](README.md)
 
+[![ci](https://github.com/lucasgabrieldevgg/portal-escolar-inteligente/actions/workflows/ci.yml/badge.svg)](https://github.com/lucasgabrieldevgg/portal-escolar-inteligente/actions/workflows/ci.yml)
+
+## 🧪 Desenvolvimento
+
+```
+bun install && bunx prisma generate && bun run lint && bun run build
+```
+
+O CI roda o pipeline completo a cada push (lockfile congelado → cliente Prisma → ESLint → build do Next como smoke real + higiene contra segredos). Licença MIT.
+
+## 🎨 Identidade — ESCOLA (operação CRA)
+
+**Nunito** (amigável e legível — cara de escola gamificada) no app, **JetBrains Mono** em números/XP/código. Zero fonte-default-de-template (Geist/Inter). Os gradientes ouro/prata/bronze das medalhas ficam — são os *metais*, não decoração.
+
 ---
 
 # Portal Escolar Inteligente
