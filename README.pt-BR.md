@@ -2,7 +2,7 @@
 
 > Plataforma escolar com assistente de IA, XP/moedinhas, loja de skins, badges e biblioteca com validação por IA.
 >
-> **Status:** MVP de demonstração · Escola Estadual Professora Eunice Souza dos Santos (Rondonópolis-MT)
+> **Status:** MVP de demonstração · demo pública com dados fictícios
 
 [Read in English](README.md)
 
@@ -26,7 +26,7 @@ O CI roda o pipeline completo a cada push (lockfile congelado → cliente Prisma
 
 Plataforma escolar com assistente de IA, sistema de XP/moedinhas, loja de skins, badges, biblioteca com validação por IA, ranking semanal e programa de caça aos bugs.
 
-> **Status**: MVP de demonstração · Desenvolvido para a Escola Estadual Professora Eunice Souza dos Santos (Rondonópolis-MT)
+> **Status**: MVP de demonstração · todos os dados são fictícios
 
 ## Demonstração online
 
@@ -204,7 +204,7 @@ Wikipedia API não precisa de chave (pública e gratuita).
 ## Sobre o projeto
 
 Idealizado por Lucas Gabriel, um aluno que percebeu que pensa melhor andando.
-Desenvolvido para a Escola Estadual Professora Eunice Souza dos Santos (Rondonópolis-MT).
+Demo pública — escolas, alunos e dados exibidos são fictícios.
 
 Este é um projeto de demonstração. Mesmo que a escola não adote, fica como portfólio no GitHub.
 

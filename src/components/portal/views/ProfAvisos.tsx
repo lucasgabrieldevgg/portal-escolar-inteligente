@@ -35,7 +35,7 @@ export function ProfAvisos() {
   const [enviando, setEnviando] = useState(false)
 
   const reload = () => {
-    api<{ avisos: AvisoTurma[] }>(`/api/avisos-turma${turmaSel ? `?turmaId=${turmaSel}` : ''}`).then((d) => {
+    api<{ avisos: AvisoTurma[] }>(`/api/avisos-turma${turmaSel && turmaSel !== 'todas' ? `?turmaId=${turmaSel}` : ''}`).then((d) => {
       setAvisos(d.avisos)
       setLoading(false)
     })
@@ -128,7 +128,7 @@ export function ProfAvisos() {
                   <SelectValue placeholder="Todas as turmas" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">Todas as turmas</SelectItem>
+                  <SelectItem value="todas">Todas as turmas</SelectItem>
                   {turmas.map((t) => (
                     <SelectItem key={t.id} value={t.id}>{t.nome}</SelectItem>
                   ))}

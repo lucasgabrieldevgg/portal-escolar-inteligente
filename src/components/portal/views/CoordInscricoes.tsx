@@ -48,7 +48,7 @@ export function CoordInscricoes() {
     api<{ inscricoes: Inscricao[] }>('/api/inscricoes').then((d) => {
       setInscricoes(d.inscricoes)
       setLoading(false)
-    })
+    }).catch(() => setLoading(false))
   }
 
   useEffect(() => { reload() }, [])

@@ -30,7 +30,7 @@ export function CoordMoedinhas() {
     api<{ users: any[] }>('/api/contas').then((d) => {
       setUsers(d.users.map((u: any) => ({ ...u })) as Conta[])
       setLoading(false)
-    })
+    }).catch(() => setLoading(false))
   }, [])
 
   const filtrados = users.filter(
@@ -83,7 +83,7 @@ export function CoordMoedinhas() {
           onConcedido={() => {
             setAlvo(null)
             // Atualiza localmente
-            api<{ users: any[] }>('/api/contas').then((d) => setUsers(d.users as Conta[]))
+            api<{ users: any[] }>('/api/contas').then((d) => setUsers(d.users as Conta[])).catch(() => setLoading(false))
           }}
         />
       )}

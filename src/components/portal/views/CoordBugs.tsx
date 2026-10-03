@@ -41,7 +41,7 @@ export function CoordBugs({ onAvaliado }: { onAvaliado?: () => void }) {
     api<{ bugs: Bug[] }>('/api/bugs').then((d) => {
       setBugs(d.bugs)
       setLoading(false)
-    })
+    }).catch(() => setLoading(false))
   }
 
   useEffect(() => { reload() }, [])

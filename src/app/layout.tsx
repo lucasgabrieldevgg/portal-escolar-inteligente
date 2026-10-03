@@ -23,7 +23,7 @@ const jbm = JetBrains_Mono({
 export const metadata: Metadata = {
   title: "Portal Escolar Inteligente",
   description:
-    "Plataforma escolar com assistente de IA, sistema de XP, rankings, badges e programa de colaboradores. Escola Estadual Professora Eunice Souza dos Santos - Rondonópolis-MT.",
+    "Plataforma escolar com assistente de IA, sistema de XP, rankings, badges e programa de leitura. Demonstração pública com dados fictícios.",
   keywords: [
     "portal escolar",
     "educação",

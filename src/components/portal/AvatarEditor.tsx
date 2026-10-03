@@ -51,7 +51,7 @@ export function AvatarEditor({ avatarConfig, onSaved }: { avatarConfig?: string 
       setSkins(d.skins)
       setMoedinhas(d.moedinhas)
       setLoading(false)
-    })
+    }).catch(() => setLoading(false))
   }
 
   useEffect(() => {

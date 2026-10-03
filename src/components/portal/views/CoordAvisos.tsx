@@ -43,7 +43,7 @@ export function CoordAvisos() {
     api<{ avisos: Aviso[] }>('/api/avisos').then((d) => {
       setAvisos(d.avisos)
       setLoading(false)
-    })
+    }).catch(() => setLoading(false))
   }
 
   useEffect(() => { reload() }, [])

@@ -29,7 +29,6 @@ export async function POST(req: NextRequest) {
 
   const systemPrompt = `Você é o assistente de IA do Portal Escolar Inteligente, em modo Professor.
 
-Atende professores da Escola Estadual Professora Eunice Souza dos Santos, em Rondonópolis-MT.
 Ajudar a:
 - Criar tarefas e descrições didáticas para alunos do 6º ao 9º ano
 - Sugerir rubricas de avaliação

@@ -50,12 +50,12 @@ export function CoordContas() {
     api<{ users: Conta[] }>('/api/contas').then((d) => {
       setUsers(d.users)
       setLoading(false)
-    })
+    }).catch(() => setLoading(false))
   }
 
   useEffect(() => {
     reload()
-    api<{ turmas: Turma[] }>('/api/turmas').then((d) => setTurmas(d.turmas))
+    api<{ turmas: Turma[] }>('/api/turmas').then((d) => setTurmas(d.turmas)).catch(() => setLoading(false))
   }, [])
 
   const filtrados = users

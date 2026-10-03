@@ -19,29 +19,13 @@ export function InfoView() {
             <CardHeader>
               <CardTitle className="text-base flex items-center gap-2">
                 <School className="w-5 h-5 text-emerald-600" />
-                Escola Estadual Professora Eunice Souza dos Santos
+                Escola de Demonstração
               </CardTitle>
               <CardDescription>
-                Escola pública estadual de Ensino Fundamental II.
+                Instituição fictícia — esta é uma demonstração pública do portal.
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-3 text-sm">
-              <p className="flex items-start gap-2">
-                <GraduationCap className="w-4 h-4 mt-0.5 text-emerald-600 flex-shrink-0" />
-                <span><strong>Localização:</strong> Rondonópolis — Mato Grosso (MT)</span>
-              </p>
-              <p className="flex items-start gap-2">
-                <BookOpen className="w-4 h-4 mt-0.5 text-emerald-600 flex-shrink-0" />
-                <span><strong>Atendimento:</strong> Ensino Fundamental II (6º ao 9º ano).</span>
-              </p>
-              <p className="flex items-start gap-2">
-                <School className="w-4 h-4 mt-0.5 text-emerald-600 flex-shrink-0" />
-                <span><strong>Turnos:</strong> 6º e 7º ano à tarde · 8º e 9º ano pela manhã.</span>
-              </p>
-              <p className="flex items-start gap-2">
-                <Library className="w-4 h-4 mt-0.5 text-emerald-600 flex-shrink-0" />
-                <span><strong>Biblioteca ativa:</strong> Programa de leitura com recompensas em XP e moedinhas para resumos de livros.</span>
-              </p>
             </CardContent>
           </Card>
         </TabsContent>

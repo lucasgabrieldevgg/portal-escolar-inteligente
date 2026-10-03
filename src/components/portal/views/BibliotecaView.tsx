@@ -49,7 +49,7 @@ export function BibliotecaView() {
     api<{ resumos: Resumo[] }>('/api/resumos-biblioteca').then((d) => {
       setResumos(d.resumos)
       setLoading(false)
-    })
+    }).catch(() => setLoading(false))
   }
 
   useEffect(() => { reload() }, [])

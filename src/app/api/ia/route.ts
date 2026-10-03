@@ -5,7 +5,7 @@ import { chat, classificarDificuldade, ChatMessage } from '@/lib/ia'
 import { pesquisarWikipedia, precisaPesquisaWiki, formatarContextoWiki } from '@/lib/wikipedia'
 import { detectarFerramentas, formatarFerramentas } from '@/lib/ferramentas'
 
-const SYSTEM_PROMPT = `Você é o assistente de IA do Portal Escolar Inteligente, da Escola Estadual Professora Eunice Souza dos Santos (Rondonópolis-MT).
+const SYSTEM_PROMPT = `Você é o assistente de IA do Portal Escolar Inteligente.
 
 Você ajuda alunos do 6º ao 9º ano do Ensino Fundamental (idades 11-15 anos) a estudar.
 

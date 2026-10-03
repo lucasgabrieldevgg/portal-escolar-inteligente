@@ -29,7 +29,13 @@ export const useApp = create<AppState>((set) => ({
 }))
 
 export async function api<T = any>(url: string, options?: RequestInit): Promise<T> {
-  const res = await fetch(url, { ...options, headers: { 'Content-Type': 'application/json', ...(options?.headers || {}) } })
+  const pedir = () => fetch(url, { ...options, headers: { 'Content-Type': 'application/json', ...(options?.headers || {}) } })
+  let res = await pedir().catch(() => null)
+  if (!res) {
+    // rede piscou / servidor acordando: 1 retry antes de desistir
+    await new Promise((r) => setTimeout(r, 700))
+    res = await pedir()
+  }
   const data = await res.json().catch(() => ({}))
   if (!res.ok) throw new Error((data as any)?.error || `Erro ${res.status}`)
   return data as T

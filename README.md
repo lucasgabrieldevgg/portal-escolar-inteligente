@@ -2,7 +2,7 @@
 
 > School platform with an AI assistant, XP/coins system, skin shop, badges, AI-validated library, weekly ranking and a bug-hunting program.
 
-> **Status:** demonstration MVP · Built for Escola Estadual Professora Eunice Souza dos Santos (Rondonópolis, MT, Brazil)
+> **Status:** demonstration MVP · public demo with fictional data
 
 [Leia em Português](README.pt-BR.md)
 
@@ -196,7 +196,7 @@ The Wikipedia API needs no key (public and free).
 ## About the project
 
 Created by Lucas Gabriel, a student who realized he thinks better while walking.
-Built for Escola Estadual Professora Eunice Souza dos Santos (Rondonópolis, MT).
+Public demo — all schools, students and data are fictional.
 
 This is a demonstration project. Even if the school doesn't adopt it, it stands as a portfolio piece on GitHub.
 

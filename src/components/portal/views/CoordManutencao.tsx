@@ -22,7 +22,7 @@ export function CoordManutencao() {
       setManutencao(d.manutencao)
       setMensagem(d.mensagem)
       setDominioEmail(d.dominioEmail)
-    })
+    }).catch(() => {})
   }, [])
 
   async function salvar() {

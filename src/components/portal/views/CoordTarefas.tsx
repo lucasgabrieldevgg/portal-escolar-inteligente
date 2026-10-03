@@ -29,7 +29,7 @@ export function CoordTarefas() {
     api<{ tarefas: Tarefa[] }>('/api/tarefas').then((d) => {
       setTarefas(d.tarefas)
       setLoading(false)
-    })
+    }).catch(() => setLoading(false))
   }, [])
 
   return (

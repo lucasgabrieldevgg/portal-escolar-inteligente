@@ -277,7 +277,7 @@ export function Dashboard() {
 
         <footer className="border-t bg-card py-3 mt-auto">
           <div className="container mx-auto px-4 text-center text-[11px] text-muted-foreground">
-            Portal Escolar Inteligente · Escola Est. Profª Eunice Souza dos Santos · Rondonópolis-MT
+            Portal Escolar Inteligente · Demonstração pública · dados fictícios
           </div>
         </footer>
       </div>

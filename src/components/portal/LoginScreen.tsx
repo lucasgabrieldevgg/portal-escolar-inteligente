@@ -71,7 +71,7 @@ export function LoginScreen() {
             </div>
             <div>
               <h1 className="text-lg font-bold leading-tight">Portal Escolar Inteligente</h1>
-              <p className="text-xs text-muted-foreground">Escola Est. Profª Eunice Souza dos Santos · Rondonópolis-MT</p>
+              <p className="text-xs text-muted-foreground">Portal Escolar Inteligente · Demonstração pública</p>
             </div>
           </div>
           <div className="flex items-center gap-2">
