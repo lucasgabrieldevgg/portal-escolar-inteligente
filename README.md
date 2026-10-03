@@ -16,7 +16,7 @@ bun install && bunx prisma generate && bun run lint && bun run build
 
 CI runs the full pipeline on every push (frozen lockfile → Prisma client → ESLint → Next build as a real smoke test + secret-scan hygiene). MIT licensed.
 
-## 🎨 Identity — ESCOLA (operação CRA)
+## 🎨 Identity — ESCOLA
 
 **Nunito** (friendly, readable — the school gamified look) for the app, **JetBrains Mono** for numbers/XP/code. No template default fonts (Geist/Inter). The gold/silver/bronze medal gradients stay — they are the *metals*, not decoration.
 

@@ -119,7 +119,7 @@
   }
   body {
     @apply bg-background text-foreground;
-    /* CRA: o template nunca ligou a fonte no body — Nunito vale de verdade */
+    /* o template nunca ligou a fonte no body — Nunito vale de verdade */
     font-family: var(--font-nunito), ui-sans-serif, system-ui, sans-serif;
   }
 }

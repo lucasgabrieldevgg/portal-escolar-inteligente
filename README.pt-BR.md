@@ -16,7 +16,7 @@ bun install && bunx prisma generate && bun run lint && bun run build
 
 O CI roda o pipeline completo a cada push (lockfile congelado → cliente Prisma → ESLint → build do Next como smoke real + higiene contra segredos). Licença MIT.
 
-## 🎨 Identidade — ESCOLA (operação CRA)
+## 🎨 Identidade — ESCOLA
 
 **Nunito** (amigável e legível — cara de escola gamificada) no app, **JetBrains Mono** em números/XP/código. Zero fonte-default-de-template (Geist/Inter). Os gradientes ouro/prata/bronze das medalhas ficam — são os *metais*, não decoração.
 
