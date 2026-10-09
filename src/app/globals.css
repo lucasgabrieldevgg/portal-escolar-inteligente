@@ -125,6 +125,10 @@
 }
 
 /* Scrollbar styling */
+/* ===== piso de acabamento (superfícies do navegador temáticas) ===== */
+::selection { background: color-mix(in srgb, var(--primary) 30%, transparent); color: inherit; }
+html { scrollbar-color: var(--border) transparent; scrollbar-width: thin; }
+
 .scrollbar-thin::-webkit-scrollbar {
   width: 6px;
   height: 6px;
